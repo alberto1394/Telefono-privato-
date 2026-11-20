@@ -1,0 +1,42 @@
+
+name: Crea APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica il progetto
+        uses: actions/checkout@v4
+
+      - name: Prepara Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Estrai il progetto ZIP
+        run: |
+          unzip -q TelefonoPrivato_Completo_Galaxy_A16.zip -d source
+
+      - name: Compila applicazione Android
+        run: |
+          cd source
+          gradle :app:assembleDebug
+
+      - name: Salva APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TelefonoPrivato-APK
+          path: source/app/build/outputs/apk/debug/app-debug.apk
